@@ -2,7 +2,9 @@
 title: "Chlamydia_Venn"
 author: "Usman"
 date: "2023-11-05"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -35,7 +37,7 @@ Chlamydia_Venn%>%select(IgG,IgM)%>%
 Chlamydia_Venn
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
 
 ```{r}
 Chla_Tris_Venn<-Chlamydia_Venn%>%select(IgG,IgM)%>%
@@ -68,6 +70,9 @@ Ct_fertile
 ```
 
 ```{r}
-ggarrange(Ct_total,Ct_fertile,Ct_Infertile,labels = c("Ig-Total","Ig-Fertile","Ig-Infertile"))
+library(ggpubr)
+ggarrange(Ct_total,
+          Ct_fertile,Ct_Infertile,
+          labels = c("Ig-Total","Ig-Fertile","Ig-Infertile"))
 ```
 
