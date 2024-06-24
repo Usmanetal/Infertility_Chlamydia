@@ -1,0 +1,73 @@
+---
+title: "Chlamydia_Venn"
+author: "Usman"
+date: "2023-11-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+
+```{r Chlamydia, echo=TRUE}
+library(readxl)
+Chlamydia_Venn <- read_excel("C:/Users/Usman Ola/Downloads/Chlamydia Trichomatis.xlsx")
+head(Chlamydia_Venn)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r Prevalence, echo=TRUE}
+#library(BiocManager)
+library(limma)
+#library(VennDiagram)
+library(ggVennDiagram)
+library(tidyverse)
+Chlamydia_Venn%>%select(IgG,IgM)%>%
+  mutate(IgG=recode(IgG,Neg=0,Pos=1), IgM=recode(IgM,Neg=0,Pos=1))%>%
+  vennCounts()%>%vennDiagram()
+Chlamydia_Venn
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+Chla_Tris_Venn<-Chlamydia_Venn%>%select(IgG,IgM)%>%
+  mutate(IgG=recode(IgG,Neg=0,Pos=1), IgM=recode(IgM,Neg=0,Pos=1))
+Chla_Tris_Venn
+Ct_total<-ggVennDiagram(lapply(Chla_Tris_Venn, function(x)which(x==1)))+scale_fill_gradient(low = "white",high = "white")+
+    theme(legend.position = "none",plot.tag.position="bottomleft")
+Ct_total
+```
+
+```{r}
+Chla_Tris_Venn_Inf<-Chlamydia_Venn%>%
+  filter(Group=="Infertile")%>%select(IgG,IgM)%>%
+  mutate(IgG=recode(IgG,Neg=0,Pos=1), IgM=recode(IgM,Neg=0,Pos=1))
+Chla_Tris_Venn_Inf
+Ct_Infertile<-ggVennDiagram(lapply(Chla_Tris_Venn_Inf, function(x)which(x==1)))+scale_fill_gradient(low = "white",high = "white")+
+    theme(legend.position = "none",plot.tag.position="bottomleft")
+Ct_Infertile
+```
+
+```{r}
+Chla_Tris_Venn_Fer<-Chlamydia_Venn%>%
+  filter(Group=="Fertile")%>%
+  select(IgG,IgM)%>%
+  mutate(IgG=recode(IgG,Neg=0,Pos=1), IgM=recode(IgM,Neg=0,Pos=1))
+Chla_Tris_Venn_Fer
+Ct_fertile<-ggVennDiagram(lapply(Chla_Tris_Venn_Fer, function(x)which(x==1)))+scale_fill_gradient(low = "white",high = "white")+
+    theme(legend.position = "none",plot.tag.position="bottomleft")
+Ct_fertile
+```
+
+```{r}
+ggarrange(Ct_total,Ct_fertile,Ct_Infertile,labels = c("Ig-Total","Ig-Fertile","Ig-Infertile"))
+```
+
