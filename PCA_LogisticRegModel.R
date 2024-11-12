@@ -208,7 +208,7 @@ Figure_pca<-ggarrange(Ct_pos_neg_pca,Ct_Pri_sec_both,labels = c("A",
 
 ## **Cytokine levels in Fertile and Infertile subset by their Chlamydial positivity**
 
-```{r}
+
 pwc <- newdata %>%
   #group_by(chlamydia_pos)%>%
   dunn_test(il_10_avrg~chlamydia_pos,p.adjust.method = "none")
@@ -254,7 +254,7 @@ ggarrange(Interleukin_10,Interferon_alpha,Heat_shock_Prot,nrow = 1)
 
 ### Cytokine levels Infertility data subset by Primary or Secondary Infertility and their Chlamydial sensitivity
 
-```{r}
+
 pwc3 <- newdata[newdata$group=="Infertile",] %>%
   group_by(chlamydia_pos)%>%
   dunn_test(il_10_avrg~any_preg,p.adjust.method = "none")
@@ -785,3 +785,31 @@ figure_Model2<-ggarrange(Fertility_Model2,Infertility_Model1,ncol = 1,nrow = 2)
 #                          theme(axis.title = element_text(size=12))))
 
 
+### Logistic regression of IgM|IgG been positive or negative
+#### IgG 
+IgG.IgM_logistic_reg <- new_logistic%>%
+  dplyr::filter(IgG %in% "Pos"| IgM %in% "Pos") %>%
+  mutate(IgG=recode(IgG,"Pos"=1,"Neg"=0),IgM=recode(IgM,"Pos"=1,"Neg"=0))
+
+logistic_IgG_IgM<- glm(IgG~IgG.IgM_logistic_reg$ifn_gam_quatile_cat, 
+                       data = IgG.IgM_logistic_reg,family=binomial)
+
+# IgG_reg<-IgG_logistic_reg%>%
+#   mutate(IgG=ifelse(IgG=="Pos",1,0))  
+# 
+# IgG_reg<-IgG_logistic_reg%>%
+#   mutate(IgG=recode(IgG,"Pos"=1,"Neg"=0)) 
+
+logistic_IgG_IgM<- glm(IgG~IgG.IgM_logistic_reg$Age.category + 
+                         IgG.IgM_logistic_reg$ifn_gam_quatile_cat+
+                         IgG.IgM_logistic_reg$hsp_60_avrg+
+                         IgG.IgM_logistic_reg$il_10_quatile_cat, 
+                       data = IgG.IgM_logistic_reg,family=binomial)
+
+
+### Nice Table Out Put
+
+library(jtools) #for nice table model output
+IgG_IgM.Table<-summ(logistic_IgG_IgM,
+     confint = TRUE, digits = 3, 
+     vifs = TRUE) # add vif to see if variance inflation factor is greater than 2

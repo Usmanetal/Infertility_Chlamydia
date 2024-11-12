@@ -3,8 +3,8 @@ title: "Cytokine_HSP60_Analysis"
 author: "Usman"
 date: "2024-06-23"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
